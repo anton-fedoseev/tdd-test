@@ -1,65 +1,27 @@
-import { useEffect, useState } from 'react';
-import { observer } from 'mobx-react-lite';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
+import React from 'react';
 import Button from '@mui/material/Button';
 
-import { Loader, CreateBookModal } from '@/components';
-import type { CreateBookDto } from '@/types/dto';
-
-import { BooksStore } from '@/stores/books';
+import type { Book } from '@/types/general';
+import { BooksList } from '@/components';
 
 import { Wrapper } from './styled';
 
 interface IAllBooksView {
-    store: BooksStore;
-    onAddBook: (values: CreateBookDto) => void;
+    books: Book[];
+    onAddBook: () => void;
 }
 
-export const AllBooksView = observer<IAllBooksView>(({ store, onAddBook }) => {
-    const { books, initialLoading, isLoading, isSuccess } = store;
-
-    const [isCreateBookModalOpen, setIsCreateBookModalOpen] = useState(false);
-
-    useEffect(() => {
-        if (isSuccess) {
-            setIsCreateBookModalOpen(false);
-        }
-    }, [isSuccess]);
-
-    if (initialLoading) {
-        return <Loader />;
-    }
-
+export const AllBooksView: React.FC<IAllBooksView> = ({ onAddBook, books }) => {
     return (
         <Wrapper>
             <Button
                 variant="contained"
                 sx={{ marginLeft: 'auto', marginBottom: '15px' }}
-                onClick={() => setIsCreateBookModalOpen(true)}
+                onClick={onAddBook}
             >
                 Add book
             </Button>
-            <List>
-                {books.map((book, index) => (
-                    <ListItem
-                        key={index}
-                        sx={{ border: '1px solid #1976d2', marginBottom: '5px' }}
-                    >
-                        <ListItemText
-                            primary={book.name}
-                            secondary={book.author}
-                        />
-                    </ListItem>
-                ))}
-            </List>
-            <CreateBookModal
-                isLoading={isLoading}
-                isOpen={isCreateBookModalOpen}
-                onClose={() => setIsCreateBookModalOpen(false)}
-                onSubmit={onAddBook}
-            />
+            <BooksList books={books} />
         </Wrapper>
     );
-});
+};
